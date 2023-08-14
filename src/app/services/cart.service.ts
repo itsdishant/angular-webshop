@@ -38,12 +38,12 @@ export class CartService {
     this._snackBar.open("Cart is cleared.", "Ok", { duration: 3000 });
   }
 
-  removeFromCart(item: CartItem, update = true): Array<CartItem> {
-    const filteredItems = this.cart.value.items.filter((_item) => {
-      _item.id !== item.id;
-    });
+  removeFromCart(item: CartItem, updateCart = true): CartItem[] {
+    const filteredItems = this.cart.value.items.filter(
+      (_item) => _item.id !== item.id
+    );
 
-    if (update) {
+    if (updateCart) {
       this.cart.next({ items: filteredItems });
       this._snackBar.open("1 item removed from cart.", "Ok", {
         duration: 3000,

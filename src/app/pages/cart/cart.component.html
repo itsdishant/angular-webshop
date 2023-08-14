@@ -69,7 +69,12 @@
         </button>
       </td>
       <td mat-footer-cell *matFooterCellDef>
-        <button mat-raised-button color="primary" class="float-right">
+        <button
+          (click)="onCheckout()"
+          mat-raised-button
+          color="primary"
+          class="float-right"
+        >
           Proceed to Checkout
         </button>
       </td>
@@ -79,7 +84,7 @@
     <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
   </table>
 </mat-card>
-<mat-card *ngIf="!cart.items.length">
+<mat-card class="max-w-7xl mx-auto" *ngIf="!cart.items.length">
   <p class="p-2">
     Your cart is empty!
     <button mat-raised-button routerLink="/home">Start Shopping</button>
