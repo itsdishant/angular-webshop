@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, inject } from "@angular/core";
 import { Cart, CartItem } from "src/app/models/cart.model";
 import { CartService } from "src/app/services/cart.service";
 
@@ -11,7 +11,7 @@ export class HeaderComponent {
   private _cart: Cart = { items: [] };
   itemsQuantity = 0;
 
-  constructor(private cartService: CartService) {}
+  private cartService = inject(CartService);
 
   @Input()
   get cart(): Cart {

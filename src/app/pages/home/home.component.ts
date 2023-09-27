@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Subscription } from "rxjs";
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
@@ -24,10 +24,8 @@ export class HomeComponent implements OnInit {
   limit = 12;
   productSubscription: Subscription | undefined;
 
-  constructor(
-    private cartService: CartService,
-    private storeService: StoreService
-  ) {}
+  private cartService = inject(CartService);
+  private storeService = inject(StoreService);
 
   ngOnInit(): void {
     this.getProducts();

@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject } from "rxjs";
 import { Cart, CartItem } from "../models/cart.model";
@@ -9,7 +9,7 @@ import { Cart, CartItem } from "../models/cart.model";
 export class CartService {
   cart = new BehaviorSubject<Cart>({ items: [] });
 
-  constructor(private _snackBar: MatSnackBar) {}
+  private _snackBar = inject(MatSnackBar);
 
   addToCart(item: CartItem): void {
     const items = [...this.cart.value.items];
