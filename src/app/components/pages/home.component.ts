@@ -12,8 +12,31 @@ const ROWS_HEIGHT: { [id: number]: number } = {
 
 @Component({
   selector: "app-home",
-  templateUrl: "./home.component.html",
-  styles: [],
+  template: `<mat-drawer-container
+    [autosize]="true"
+    class="min-h-full max-w-7xl mx-auto border-x"
+  >
+    <mat-drawer mode="side" opened class="p-6">
+      <app-filters (showCategory)="onShowCategory($event)"></app-filters>
+    </mat-drawer>
+    <mat-drawer-content class="p-6">
+      <app-products-header
+        (columnsCountChange)="onColumnsCountChange($event)"
+        (sortValueChange)="onSortValueChange($event)"
+        (itemsShowCountChange)="onItemsShowCountChange($event)"
+      ></app-products-header>
+      <mat-grid-list gutterSize="16" [cols]="cols" [rowHeight]="rowHeight">
+        <mat-grid-tile *ngFor="let product of products">
+          <app-product-box
+            [product]="product"
+            class="w-full"
+            [fullWidthMode]="cols === 1"
+            (addToCart)="onAddToCart($event)"
+          ></app-product-box>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </mat-drawer-content>
+  </mat-drawer-container> `,
 })
 export class HomeComponent implements OnInit {
   cols = 3;

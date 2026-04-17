@@ -4,8 +4,20 @@ import { StoreService } from "src/app/services/store.service";
 
 @Component({
   selector: "app-filters",
-  templateUrl: "filters.component.html",
-  styles: [],
+  template: `<mat-expansion-panel *ngIf="categories">
+    <mat-expansion-panel-header>
+      <mat-panel-title> CATEGORIES </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-selection-list [multiple]="false">
+      <mat-list-item
+        class="text-center"
+        *ngFor="let category of categories"
+        (click)="onShowCategory(category)"
+      >
+        {{ category }}
+      </mat-list-item>
+    </mat-selection-list>
+  </mat-expansion-panel> `,
 })
 export class FiltersComponent implements OnInit {
   categories: Array<string> = [];

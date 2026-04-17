@@ -17,15 +17,18 @@ import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { HeaderComponent } from "./components/header/header.component";
-import { HomeComponent } from "./pages/home/home.component";
-import { ProductsHeaderComponent } from "./pages/home/components/products-header/products-header.component";
-import { FiltersComponent } from "./pages/home/components/filters/filters.component";
-import { ProductBoxComponent } from "./pages/home/components/product-box/product-box.component";
-import { CartComponent } from "./pages/cart/cart.component";
+import { HeaderComponent } from "./pages/home/header.component";
+import { HomeComponent } from "./components/pages/home.component";
+import { ProductsHeaderComponent } from "./components/products-header.component";
+import { FiltersComponent } from "./components/filters.component";
+import { ProductBoxComponent } from "./components/product-box.component";
+import { CartComponent } from "./components/pages/cart.component";
 import { CartService } from "./services/cart.service";
 import { StoreService } from "./services/store.service";
-import { HttpClientModule } from "@angular/common/http";
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -37,6 +40,7 @@ import { HttpClientModule } from "@angular/common/http";
     ProductBoxComponent,
     CartComponent,
   ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -53,9 +57,11 @@ import { HttpClientModule } from "@angular/common/http";
     MatTableModule,
     MatBadgeModule,
     MatSnackBarModule,
-    HttpClientModule,
   ],
-  providers: [CartService, StoreService],
-  bootstrap: [AppComponent],
+  providers: [
+    CartService,
+    StoreService,
+    provideHttpClient(withInterceptorsFromDi()),
+  ],
 })
 export class AppModule {}
