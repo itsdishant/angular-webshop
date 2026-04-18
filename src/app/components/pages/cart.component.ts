@@ -3,25 +3,30 @@ import { HttpClient } from "@angular/common/http";
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
+  computed,
   inject,
+  signal,
+  DestroyRef,
 } from "@angular/core";
 import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
 import { loadStripe } from "@stripe/stripe-js";
-import { Cart, CartItem } from "src/app/models/cart.model";
+import { CartItem } from "src/app/models/cart.model";
 import { CartService } from "src/app/services/cart.service";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { filter, switchMap } from "rxjs";
+import { derivedAsync } from "ngxtension/derived-async";
+import { Subject } from "rxjs";
 
 @Component({
   selector: "app-cart",
   imports: [MatCard, MatTableModule, MatIcon, CurrencyPipe],
-  template: ` @if (cart.items.length > 0) {
+  template: ` @if (cartItems() && cartItems().length > 0) {
       <mat-card class="max-w-7xl mx-auto">
-        <ng-template></ng-template>
         <table
           mat-table
-          [dataSource]="dataSource"
+          [dataSource]="cartItems()"
           class="mat-elevation-z8 w-full"
         >
           <ng-container matColumnDef="product">
@@ -39,6 +44,7 @@ import { CartService } from "src/app/services/cart.service";
               </button>
             </td>
           </ng-container>
+
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Name</th>
             <td mat-cell *matCellDef="let element">
@@ -46,6 +52,7 @@ import { CartService } from "src/app/services/cart.service";
             </td>
             <td mat-footer-cell *matFooterCellDef></td>
           </ng-container>
+
           <ng-container matColumnDef="price">
             <th mat-header-cell *matHeaderCellDef>Price</th>
             <td mat-cell *matCellDef="let element">
@@ -53,6 +60,7 @@ import { CartService } from "src/app/services/cart.service";
             </td>
             <td mat-footer-cell *matFooterCellDef></td>
           </ng-container>
+
           <ng-container matColumnDef="quantity">
             <th mat-header-cell *matHeaderCellDef>Quantity</th>
             <td mat-cell *matCellDef="let element">
@@ -66,6 +74,7 @@ import { CartService } from "src/app/services/cart.service";
             </td>
             <td mat-footer-cell *matFooterCellDef></td>
           </ng-container>
+
           <ng-container matColumnDef="total">
             <th mat-header-cell *matHeaderCellDef>Total</th>
             <td mat-cell *matCellDef="let element">
@@ -73,10 +82,11 @@ import { CartService } from "src/app/services/cart.service";
             </td>
             <td mat-footer-cell *matFooterCellDef>
               <span class="font-bold py-5 block">
-                {{ getTotal(cart.items) | currency }}
+                {{ total() | currency }}
               </span>
             </td>
           </ng-container>
+
           <ng-container matColumnDef="action">
             <th mat-header-cell *matHeaderCellDef>
               <button
@@ -104,14 +114,20 @@ import { CartService } from "src/app/services/cart.service";
                 mat-raised-button
                 color="primary"
                 class="float-right"
+                [disabled]="isProcessingPayment()"
               >
-                Proceed to Checkout
+                {{
+                  isProcessingPayment()
+                    ? "Processing..."
+                    : "Proceed to Checkout"
+                }}
               </button>
             </td>
           </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+          <tr mat-footer-row *matFooterRowDef="displayedColumns()"></tr>
         </table>
       </mat-card>
     } @else {
@@ -124,57 +140,48 @@ import { CartService } from "src/app/services/cart.service";
     }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CartComponent implements OnInit {
-  private cartService = inject(CartService);
-  private http = inject(HttpClient);
+export class CartComponent {
+  private readonly cartService = inject(CartService);
+  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
 
-  cart: Cart = {
-    items: [
-      {
-        product: "https://via.placeholder.com/300",
-        name: "snickers",
-        price: 150,
-        quantity: 1,
-        id: 1,
-      },
-      {
-        product: "https://via.placeholder.com/300",
-        name: "shoes",
-        price: 150,
-        quantity: 1,
-        id: 1,
-      },
-    ],
-  };
-  dataSource: Array<CartItem> = [];
-  displayedColumns: Array<String> = [
+  readonly cartItems = toSignal(this.cartService.cartItems$, {
+    initialValue: [],
+  });
+  readonly cartTotal = toSignal(this.cartService.cartTotal$, {
+    initialValue: 0,
+  });
+
+  readonly isProcessingPayment = signal<boolean>(false);
+  readonly displayedColumns = signal<string[]>([
     "product",
     "name",
     "price",
     "quantity",
     "total",
     "action",
-  ];
+  ]);
 
-  ngOnInit(): void {
-    this.dataSource = this.cart.items;
-    this.cartService.cart.subscribe((_cart: Cart) => {
-      this.cart = _cart;
-      this.dataSource = this.cart.items;
-    });
-  }
+  readonly total = computed(() =>
+    this.cartItems().reduce((sum, item) => sum + item.price * item.quantity, 0),
+  );
 
-  getTotal(items: Array<CartItem>): number {
-    return this.cartService.getTotal(items);
-  }
+  private readonly stripePromise = loadStripe(
+    "pk_test_51L3e7nSHAdMfPiwldQLIqAVhtA0QacBNjRS79zKqdfXZ4zMu5nJi5udA58sMbVvKURDgSTkLPddPuMNkH4bAkY9y00342NgoQh",
+  );
 
-  clearAllCartItems(): void {
-    this.cartService.clearCart();
-  }
+  private readonly checkoutTrigger$ = new Subject<void>();
 
-  removeFromCart(item: CartItem): void {
-    this.cartService.removeFromCart(item);
-  }
+  private readonly checkoutResponse = derivedAsync(() =>
+    this.checkoutTrigger$.pipe(
+      filter(() => this.cartItems().length > 0),
+      switchMap(() =>
+        this.http.post("http://localhost:4242/checkout", {
+          items: this.cartItems(),
+        }),
+      ),
+    ),
+  );
 
   addQuantity(item: CartItem): void {
     this.cartService.addToCart(item);
@@ -184,15 +191,52 @@ export class CartComponent implements OnInit {
     this.cartService.removeQuantity(item);
   }
 
-  onCheckout(): void {
-    this.http
-      .post("http://localhost:4242/checkout", {
-        items: this.cart.items,
-      })
-      .subscribe(async (res: any) => {
-        let stripe = await loadStripe(
-          "pk_test_51L3e7nSHAdMfPiwldQLIqAVhtA0QacBNjRS79zKqdfXZ4zMu5nJi5udA58sMbVvKURDgSTkLPddPuMNkH4bAkY9y00342NgoQh",
-        );
-      });
+  removeFromCart(item: CartItem): void {
+    this.cartService.removeFromCart(item);
+  }
+
+  clearAllCartItems(): void {
+    this.cartService.clearCart();
+  }
+
+  async onCheckout(): Promise<void> {
+    if (this.isProcessingPayment() || this.cartItems().length === 0) {
+      return;
+    }
+
+    this.isProcessingPayment.set(true);
+
+    try {
+      this.checkoutTrigger$.next();
+
+      const response = await this.checkoutResponse();
+
+      if (response && (response as any).id) {
+        const stripe = await this.stripePromise;
+
+        if (stripe) {
+          const { error } = await stripe.confirmPayment({
+            elements: stripe.elements(),
+            clientSecret: (response as any).clientSecret,
+            confirmParams: {
+              return_url: `${window.location.origin}/payment-success`,
+            },
+            redirect: "if_required",
+          });
+
+          if (error) {
+            console.error("Payment error:", error);
+            alert(`Payment failed: ${error.message}`);
+          } else {
+            this.cartService.clearCart();
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("An error occurred during checkout. Please try again.");
+    } finally {
+      this.isProcessingPayment.set(false);
+    }
   }
 }

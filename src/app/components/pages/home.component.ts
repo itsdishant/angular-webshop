@@ -79,6 +79,7 @@ export class HomeComponent {
   private readonly limitSignal = signal<number>(12);
   private readonly categorySignal = signal<string>("all");
   readonly cols = signal<number>(3);
+  
   readonly rowHeight = computed(() => ROWS_HEIGHT[this.cols()]);
 
   readonly products = derivedAsync(() =>

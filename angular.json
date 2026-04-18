@@ -101,12 +101,27 @@
           "options": {
             "buildTarget": "ang-store:build"
           }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "ang-store:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ang-store:serve:production"
+            }
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "8ce73bd8-1f59-4dec-9cd9-f275a2be4c0f"
+    "analytics": "8ce73bd8-1f59-4dec-9cd9-f275a2be4c0f",
+    "schematicCollections": [
+      "@schematics/angular",
+      "playwright-ng-schematics"
+    ]
   },
   "schematics": {
     "@schematics/angular:component": {

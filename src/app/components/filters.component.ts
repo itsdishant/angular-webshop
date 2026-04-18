@@ -1,10 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  OnInit,
-  Output,
+  computed,
   inject,
+  output,
 } from "@angular/core";
 import {
   MatExpansionPanel,
@@ -12,7 +11,7 @@ import {
   MatExpansionPanelTitle,
 } from "@angular/material/expansion";
 import { MatListItem, MatSelectionList } from "@angular/material/list";
-import { Subscription } from "rxjs";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { StoreService } from "src/app/services/store.service";
 
 @Component({
@@ -24,47 +23,44 @@ import { StoreService } from "src/app/services/store.service";
     MatSelectionList,
     MatListItem,
   ],
-  template: ` @if (categories) {
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title> CATEGORIES </mat-panel-title>
-      </mat-expansion-panel-header>
-      <mat-selection-list [multiple]="false">
-        @for (category of categories; track category) {
-          <mat-list-item class="text-center" (click)="onShowCategory(category)">
-            {{ category }}
-          </mat-list-item>
-        }
-      </mat-selection-list>
-    </mat-expansion-panel>
-  }`,
+  template: `
+    @if (categories()) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title> CATEGORIES </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-selection-list [multiple]="false">
+          @for (category of categories(); track category) {
+            <mat-list-item
+              class="text-center"
+              (click)="onShowCategory(category)"
+            >
+              {{ category }}
+            </mat-list-item>
+          }
+        </mat-selection-list>
+      </mat-expansion-panel>
+    }
+  `,
   providers: [StoreService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FiltersComponent implements OnInit {
-  private storeService = inject(StoreService);
+export class FiltersComponent {
+  private readonly storeService = inject(StoreService);
 
-  @Output() showCategory = new EventEmitter<string>();
+  readonly showCategory = output<string>();
 
-  categories: Array<string> = [];
-  categoriesSubscription: Subscription | undefined;
+  private readonly categoriesFromApi = toSignal(
+    this.storeService.getAllCategories(),
+    { initialValue: [] },
+  );
 
-  ngOnInit(): void {
-    this.categoriesSubscription = this.storeService
-      .getAllCategories()
-      .subscribe((_categories) => {
-        this.categories = _categories;
-        this.categories.unshift("all");
-      });
-  }
+  readonly categories = computed(() => {
+    const categories = this.categoriesFromApi();
+    return categories.length ? ["all", ...categories] : [];
+  });
 
   onShowCategory(category: string): void {
     this.showCategory.emit(category);
-  }
-
-  ngOnDestroy(): void {
-    if (this.categoriesSubscription) {
-      this.categoriesSubscription.unsubscribe();
-    }
   }
 }

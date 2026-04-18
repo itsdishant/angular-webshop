@@ -2,14 +2,14 @@ import { CurrencyPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
+  computed,
   inject,
 } from "@angular/core";
 import { MatBadge } from "@angular/material/badge";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatToolbar } from "@angular/material/toolbar";
-import { Cart, CartItem } from "src/app/models/cart.model";
+import { derivedAsync } from "ngxtension/derived-async";
 import { CartService } from "src/app/services/cart.service";
 
 @Component({
@@ -18,10 +18,11 @@ import { CartService } from "src/app/services/cart.service";
   template: `
     <mat-toolbar class="m-auto justify-between max-w-7xl border-x">
       <a routerLink="home">Lifestyle Stores</a>
+      {{ cartItemCount() + " ----> " + itemsQuantity() }}
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon
-          [matBadge]="itemsQuantity"
-          [matBadgeHidden]="!itemsQuantity"
+          [matBadge]="itemsQuantity()"
+          [matBadgeHidden]="!itemsQuantity()"
           matBadgeColor="warn"
           >shopping_cart</mat-icon
         >
@@ -29,11 +30,11 @@ import { CartService } from "src/app/services/cart.service";
       <mat-menu #menu="matMenu">
         <div class="p-3 divide-y divide-solid">
           <div class="pb-3 flex justify-between">
-            <span class="mr-16"> {{ itemsQuantity }} items </span>
+            <span class="mr-16"> {{ itemsQuantity() }} items </span>
             <a routerLink="cart">View Cart</a>
           </div>
-          @if (cart.items.length > 0) {
-            @for (item of cart.items; track item.id) {
+          @if (!isEmpty()) {
+            @for (item of cartItems(); track item.id) {
               <div class="py-3">
                 <div class="flex font-light mb-2 justify-between">
                   {{ item.name }} x {{ item.quantity }}
@@ -43,9 +44,7 @@ import { CartService } from "src/app/services/cart.service";
             }
             <div class="py-3 font-light flex justify-between">
               Total
-              <span class="font-bold">{{
-                getTotal(cart.items) | currency
-              }}</span>
+              <span class="font-bold">{{ cartTotal() | currency }}</span>
             </div>
           }
           <div class="pt-3 flex justify-between">
@@ -63,32 +62,20 @@ import { CartService } from "src/app/services/cart.service";
             </button>
           </div>
         </div>
-      </mat-menu> </mat-toolbar
-    >,
+      </mat-menu>
+    </mat-toolbar>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  private cartService = inject(CartService);
+  private readonly cartService = inject(CartService);
 
-  private _cart: Cart = { items: [] };
-  itemsQuantity = 0;
+  readonly cartItems = derivedAsync(() => this.cartService.cartItems$, { initialValue: [] });
+  readonly cartTotal = derivedAsync(() => this.cartService.cartTotal$, { initialValue: 0 });
+  readonly cartItemCount = derivedAsync(() => this.cartService.cartItemCount$, { initialValue: 0 });
+  readonly isEmpty = derivedAsync(() => this.cartService.isEmpty$, { initialValue: true });
 
-  @Input()
-  get cart(): Cart {
-    return this._cart;
-  }
-
-  set cart(cart: Cart) {
-    this._cart = cart;
-    this.itemsQuantity = cart.items
-      .map((item) => item.quantity)
-      .reduce((prev, current) => prev + current, 0);
-  }
-
-  getTotal(items: Array<CartItem>): number {
-    return this.cartService.getTotal(items);
-  }
+  readonly itemsQuantity = computed(() => this.cartItemCount());
 
   onClearCart(): void {
     this.cartService.clearCart();

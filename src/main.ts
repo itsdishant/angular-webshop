@@ -12,7 +12,6 @@ import {
 } from "@angular/common/http";
 import { HomeComponent } from "./app/components/pages/home.component";
 import { CartComponent } from "./app/components/pages/cart.component";
-import { provideAnimations } from "@angular/platform-browser/animations";
 
 const routes: Routes = [
   {
@@ -32,7 +31,6 @@ const routes: Routes = [
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideAnimations(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withInterceptorsFromDi()),
