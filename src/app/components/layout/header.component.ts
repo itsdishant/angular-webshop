@@ -1,14 +1,20 @@
+import { CurrencyPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
   Input,
   inject,
 } from "@angular/core";
+import { MatBadge } from "@angular/material/badge";
+import { MatIcon } from "@angular/material/icon";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatToolbar } from "@angular/material/toolbar";
 import { Cart, CartItem } from "src/app/models/cart.model";
 import { CartService } from "src/app/services/cart.service";
 
 @Component({
   selector: "app-header",
+  imports: [MatToolbar, MatMenuModule, MatIcon, MatBadge, CurrencyPipe],
   template: `
     <mat-toolbar class="m-auto justify-between max-w-7xl border-x">
       <a routerLink="home">Lifestyle Stores</a>
@@ -26,22 +32,22 @@ import { CartService } from "src/app/services/cart.service";
             <span class="mr-16"> {{ itemsQuantity }} items </span>
             <a routerLink="cart">View Cart</a>
           </div>
-          <div *ngIf="cart.items.length" class="py-3">
-            <div
-              *ngFor="let item of cart.items"
-              class="flex font-light mb-2 justify-between"
-            >
-              {{ item.name }} x {{ item.quantity }}
-              <span class="font-bold">{{ item.price | currency }}</span>
+          @if (cart.items.length > 0) {
+            @for (item of cart.items; track item.id) {
+              <div class="py-3">
+                <div class="flex font-light mb-2 justify-between">
+                  {{ item.name }} x {{ item.quantity }}
+                  <span class="font-bold">{{ item.price | currency }}</span>
+                </div>
+              </div>
+            }
+            <div class="py-3 font-light flex justify-between">
+              Total
+              <span class="font-bold">{{
+                getTotal(cart.items) | currency
+              }}</span>
             </div>
-          </div>
-          <div
-            *ngIf="cart.items.length"
-            class="py-3 font-light flex justify-between"
-          >
-            Total
-            <span class="font-bold">{{ getTotal(cart.items) | currency }}</span>
-          </div>
+          }
           <div class="pt-3 flex justify-between">
             <button
               (click)="onClearCart()"
@@ -57,9 +63,11 @@ import { CartService } from "src/app/services/cart.service";
             </button>
           </div>
         </div>
-      </mat-menu>
-    </mat-toolbar>
+      </mat-menu> </mat-toolbar
+    >,
   `,
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
   private _cart: Cart = { items: [] };

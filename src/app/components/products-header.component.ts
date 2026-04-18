@@ -1,7 +1,16 @@
-import { Component, EventEmitter, Output } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output,
+} from "@angular/core";
+import { MatCard } from "@angular/material/card";
+import { MatIcon } from "@angular/material/icon";
+import { MatMenuModule } from "@angular/material/menu";
 
 @Component({
   selector: "app-products-header",
+  imports: [MatCard, MatIcon, MatMenuModule],
   template: `<mat-card class="mb-4 px-4">
     <div class="flex justify-between">
       <div class="my-5 mx-3">
@@ -37,6 +46,8 @@ import { Component, EventEmitter, Output } from "@angular/core";
       </div>
     </div>
   </mat-card> `,
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsHeaderComponent {
   sort = "desc";

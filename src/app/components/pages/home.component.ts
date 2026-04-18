@@ -1,8 +1,22 @@
-import { Component, OnInit, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+} from "@angular/core";
+import { MatGridList, MatGridTile } from "@angular/material/grid-list";
+import {
+  MatDrawer,
+  MatDrawerContainer,
+  MatDrawerContent,
+} from "@angular/material/sidenav";
 import { Subscription } from "rxjs";
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
 import { StoreService } from "src/app/services/store.service";
+import { FiltersComponent } from "../filters.component";
+import { ProductsHeaderComponent } from "../products-header.component";
+import { ProductBoxComponent } from "../product-box.component";
 
 const ROWS_HEIGHT: { [id: number]: number } = {
   1: 400,
@@ -12,6 +26,16 @@ const ROWS_HEIGHT: { [id: number]: number } = {
 
 @Component({
   selector: "app-home",
+  imports: [
+    MatDrawerContainer,
+    MatDrawer,
+    MatDrawerContent,
+    MatGridList,
+    MatGridTile,
+    FiltersComponent,
+    ProductsHeaderComponent,
+    ProductBoxComponent,
+  ],
   template: `<mat-drawer-container
     [autosize]="true"
     class="min-h-full max-w-7xl mx-auto border-x"
@@ -26,19 +50,27 @@ const ROWS_HEIGHT: { [id: number]: number } = {
         (itemsShowCountChange)="onItemsShowCountChange($event)"
       ></app-products-header>
       <mat-grid-list gutterSize="16" [cols]="cols" [rowHeight]="rowHeight">
-        <mat-grid-tile *ngFor="let product of products">
-          <app-product-box
-            [product]="product"
-            class="w-full"
-            [fullWidthMode]="cols === 1"
-            (addToCart)="onAddToCart($event)"
-          ></app-product-box>
-        </mat-grid-tile>
+        @for (product of products; track product.id) {
+          <mat-grid-tile>
+            <app-product-box
+              [product]="product"
+              class="w-full"
+              [fullWidthMode]="cols === 1"
+              (addToCart)="onAddToCart($event)"
+            ></app-product-box>
+          </mat-grid-tile>
+        }
       </mat-grid-list>
     </mat-drawer-content>
   </mat-drawer-container> `,
+  providers: [CartService, StoreService],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  private cartService = inject(CartService);
+  private storeService = inject(StoreService);
+
   cols = 3;
   rowHeight = ROWS_HEIGHT[this.cols];
   category: string = "all";
@@ -46,9 +78,6 @@ export class HomeComponent implements OnInit {
   sort = "desc";
   limit = 12;
   productSubscription: Subscription | undefined;
-
-  private cartService = inject(CartService);
-  private storeService = inject(StoreService);
 
   ngOnInit(): void {
     this.getProducts();
