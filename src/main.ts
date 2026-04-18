@@ -4,7 +4,7 @@ import {
   withEventReplay,
 } from "@angular/platform-browser";
 import { AppComponent } from "./app/app.component";
-import { ApplicationConfig } from "@angular/core";
+import { ApplicationConfig, provideZoneChangeDetection } from "@angular/core";
 import { provideRouter, Routes } from "@angular/router";
 import {
   provideHttpClient,
@@ -39,6 +39,6 @@ export const appConfig: ApplicationConfig = {
   ],
 };
 
-bootstrapApplication(AppComponent, appConfig).catch((err) =>
+bootstrapApplication(AppComponent, {...appConfig, providers: [provideZoneChangeDetection(), ...appConfig.providers]}).catch((err) =>
   console.error(err),
 );
