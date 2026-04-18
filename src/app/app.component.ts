@@ -12,15 +12,13 @@ import { HomeComponent } from "./components/pages/home.component";
 @Component({
   selector: "app-root",
   imports: [HomeComponent, HeaderComponent],
-  template: `<app-header [cart]="cart"></app-header
-    >
-    <app-home/>`,
-  standalone: true,
+  template: `<app-header [cart]="cart"></app-header> <app-home />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
-  cart: Cart = { items: [] };
   private cartSerice = inject(CartService);
+  
+  cart: Cart = { items: [] };
 
   ngOnInit(): void {
     this.cartSerice.cart.subscribe((_cart) => {

@@ -38,16 +38,16 @@ import { StoreService } from "src/app/services/store.service";
       </mat-selection-list>
     </mat-expansion-panel>
   }`,
-  standalone: true,
+  providers: [StoreService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FiltersComponent implements OnInit {
-  categories: Array<string> = [];
-  categoriesSubscription: Subscription | undefined;
+  private storeService = inject(StoreService);
 
   @Output() showCategory = new EventEmitter<string>();
 
-  private storeService = inject(StoreService);
+  categories: Array<string> = [];
+  categoriesSubscription: Subscription | undefined;
 
   ngOnInit(): void {
     this.categoriesSubscription = this.storeService

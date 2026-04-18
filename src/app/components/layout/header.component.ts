@@ -66,7 +66,6 @@ import { CartService } from "src/app/services/cart.service";
       </mat-menu> </mat-toolbar
     >,
   `,
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {

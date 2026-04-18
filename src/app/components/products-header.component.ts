@@ -46,16 +46,15 @@ import { MatMenuModule } from "@angular/material/menu";
       </div>
     </div>
   </mat-card> `,
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsHeaderComponent {
-  sort = "desc";
-  itemsShowCount = 12;
-
   @Output() columnsCountChange = new EventEmitter<number>();
   @Output() sortValueChange = new EventEmitter<string>();
   @Output() itemsShowCountChange = new EventEmitter<number>();
+
+  sort = "desc";
+  itemsShowCount = 12;
 
   onSortUpdated(newSort: string): void {
     this.sort = newSort;

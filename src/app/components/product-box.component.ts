@@ -42,7 +42,6 @@ import { Product } from "src/app/models/product.model";
       </div>
     </mat-card>
   }`,
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductBoxComponent {

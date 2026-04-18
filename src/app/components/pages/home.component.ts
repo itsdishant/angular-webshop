@@ -64,7 +64,6 @@ const ROWS_HEIGHT: { [id: number]: number } = {
     </mat-drawer-content>
   </mat-drawer-container> `,
   providers: [CartService, StoreService],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
