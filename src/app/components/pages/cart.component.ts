@@ -122,7 +122,6 @@ import { CartService } from "src/app/services/cart.service";
         </p>
       </mat-card>
     }`,
-  providers: [HttpClient],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CartComponent implements OnInit {

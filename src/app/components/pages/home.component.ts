@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
+  computed,
+  DestroyRef,
   inject,
+  signal,
 } from "@angular/core";
 import { MatGridList, MatGridTile } from "@angular/material/grid-list";
 import {
@@ -10,13 +12,15 @@ import {
   MatDrawerContainer,
   MatDrawerContent,
 } from "@angular/material/sidenav";
-import { Subscription } from "rxjs";
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
 import { StoreService } from "src/app/services/store.service";
 import { FiltersComponent } from "../filters.component";
 import { ProductsHeaderComponent } from "../products-header.component";
 import { ProductBoxComponent } from "../product-box.component";
+import { derivedAsync } from "ngxtension/derived-async";
+import { filter } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 const ROWS_HEIGHT: { [id: number]: number } = {
   1: 400,
@@ -49,13 +53,13 @@ const ROWS_HEIGHT: { [id: number]: number } = {
         (sortValueChange)="onSortValueChange($event)"
         (itemsShowCountChange)="onItemsShowCountChange($event)"
       ></app-products-header>
-      <mat-grid-list gutterSize="16" [cols]="cols" [rowHeight]="rowHeight">
-        @for (product of products; track product.id) {
+      <mat-grid-list gutterSize="16" [cols]="cols()" [rowHeight]="rowHeight()">
+        @for (product of products(); track product.id) {
           <mat-grid-tile>
             <app-product-box
               [product]="product"
               class="w-full"
-              [fullWidthMode]="cols === 1"
+              [fullWidthMode]="cols() === 1"
               (addToCart)="onAddToCart($event)"
             ></app-product-box>
           </mat-grid-tile>
@@ -66,48 +70,44 @@ const ROWS_HEIGHT: { [id: number]: number } = {
   providers: [CartService, StoreService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements OnInit {
-  private cartService = inject(CartService);
-  private storeService = inject(StoreService);
+export class HomeComponent {
+  private readonly cartService = inject(CartService);
+  private readonly storeService = inject(StoreService);
+  private destroyRef = inject(DestroyRef);
 
-  cols = 3;
-  rowHeight = ROWS_HEIGHT[this.cols];
-  category: string = "all";
-  products: Array<Product> | undefined;
-  sort = "desc";
-  limit = 12;
-  productSubscription: Subscription | undefined;
+  private readonly sortSignal = signal<string>("desc");
+  private readonly limitSignal = signal<number>(12);
+  private readonly categorySignal = signal<string>("all");
+  readonly cols = signal<number>(3);
+  readonly rowHeight = computed(() => ROWS_HEIGHT[this.cols()]);
 
-  ngOnInit(): void {
-    this.getProducts();
-  }
-
-  getProducts(): void {
-    this.productSubscription = this.storeService
-      .getAllProducts(this.limit, this.sort, this.category)
-      .subscribe((_products) => {
-        this.products = _products;
-      });
-  }
+  readonly products = derivedAsync(() =>
+    this.storeService
+      .getAllProducts(
+        this.limitSignal(),
+        this.sortSignal(),
+        this.categorySignal(),
+      )
+      .pipe(
+        filter((products) => !!products),
+        takeUntilDestroyed(this.destroyRef),
+      ),
+  );
 
   onSortValueChange(newSort: string): void {
-    this.sort = newSort;
-    this.getProducts();
+    this.sortSignal.set(newSort);
   }
 
   onItemsShowCountChange(newLimit: number): void {
-    this.limit = newLimit;
-    this.getProducts();
-  }
-
-  onColumnsCountChange(colsNum: number): void {
-    this.cols = colsNum;
-    this.rowHeight = ROWS_HEIGHT[this.cols];
+    this.limitSignal.set(newLimit);
   }
 
   onShowCategory(newCategory: string): void {
-    this.category = newCategory;
-    this.getProducts();
+    this.categorySignal.set(newCategory);
+  }
+
+  onColumnsCountChange(colsNum: number): void {
+    this.cols.set(colsNum);
   }
 
   onAddToCart(product: Product): void {
@@ -118,11 +118,5 @@ export class HomeComponent implements OnInit {
       quantity: 1,
       id: product.id,
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.productSubscription) {
-      this.productSubscription.unsubscribe();
-    }
   }
 }

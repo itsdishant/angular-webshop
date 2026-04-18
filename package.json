@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^21.2.9",
     "@angular/router": "^21.2.9",
     "@stripe/stripe-js": "^9.2.0",
+    "ngxtension": "^7.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.1"

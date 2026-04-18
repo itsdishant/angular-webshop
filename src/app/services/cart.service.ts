@@ -7,9 +7,9 @@ import { Cart, CartItem } from "../models/cart.model";
   providedIn: "root",
 })
 export class CartService {
-  cart = new BehaviorSubject<Cart>({ items: [] });
+  private snackBar = inject(MatSnackBar);
 
-  private _snackBar = inject(MatSnackBar);
+  cart = new BehaviorSubject<Cart>({ items: [] });
 
   addToCart(item: CartItem): void {
     const items = [...this.cart.value.items];
@@ -23,8 +23,7 @@ export class CartService {
     }
 
     this.cart.next({ items });
-    this._snackBar.open("1 item added to cart.", "Ok", { duration: 3000 });
-    console.log(this.cart.value);
+    this.snackBar.open("1 item added to cart.", "Ok", { duration: 3000 });
   }
 
   getTotal(items: Array<CartItem>): number {
@@ -35,17 +34,17 @@ export class CartService {
 
   clearCart(): void {
     this.cart.next({ items: [] });
-    this._snackBar.open("Cart is cleared.", "Ok", { duration: 3000 });
+    this.snackBar.open("Cart is cleared.", "Ok", { duration: 3000 });
   }
 
   removeFromCart(item: CartItem, updateCart = true): CartItem[] {
     const filteredItems = this.cart.value.items.filter(
-      (_item) => _item.id !== item.id
+      (_item) => _item.id !== item.id,
     );
 
     if (updateCart) {
       this.cart.next({ items: filteredItems });
-      this._snackBar.open("1 item removed from cart.", "Ok", {
+      this.snackBar.open("1 item removed from cart.", "Ok", {
         duration: 3000,
       });
     }
@@ -70,7 +69,7 @@ export class CartService {
     }
 
     this.cart.next({ items: filteredItems });
-    this._snackBar.open("1 quantity reduced from product.", "Ok", {
+    this.snackBar.open("1 quantity reduced from product.", "Ok", {
       duration: 3000,
     });
   }

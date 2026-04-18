@@ -51,15 +51,15 @@ import { CartService } from "src/app/services/cart.service";
           <div class="pt-3 flex justify-between">
             <button
               (click)="onClearCart()"
-              class="bg-rose-600 text-white rounded-full w-9 h-9"
+              class="bg-rose-600 text-white rounded-full w-10 h-10"
             >
-              <mat-icon>remove_shopping_cart</mat-icon>
+              <mat-icon class="m-2">remove_shopping_cart</mat-icon>
             </button>
             <button
               routerLink="cart"
-              class="bg-green-600 text-white rounded-full w-9 h-9"
+              class="bg-green-600 text-white rounded-full w-10 h-10"
             >
-              <mat-icon>shopping_cart</mat-icon>
+              <mat-icon class="m-2">shopping_cart</mat-icon>
             </button>
           </div>
         </div>
@@ -69,10 +69,10 @@ import { CartService } from "src/app/services/cart.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
+  private cartService = inject(CartService);
+
   private _cart: Cart = { items: [] };
   itemsQuantity = 0;
-
-  private cartService = inject(CartService);
 
   @Input()
   get cart(): Cart {
