@@ -325,7 +325,9 @@ export class CartComponent {
     this.cartItems().reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
-  private readonly stripePromise = loadStripe("");
+  private readonly stripePromise = loadStripe(
+    "pk_test_51TOa2rEWvxcI2QmbX5u0puMqasGtbleqNlCWdcHQu7M3DmNetEmaMwz5usiRE9nri2eIQDM3XIg4LOAq5ORJ04AM0012Hrpj9g",
+  );
 
   private readonly checkoutResponse = derivedAsync(() =>
     this.checkoutTrigger$.pipe(

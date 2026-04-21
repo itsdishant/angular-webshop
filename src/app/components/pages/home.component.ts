@@ -6,12 +6,6 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import { MatGridList, MatGridTile } from "@angular/material/grid-list";
-import {
-  MatDrawer,
-  MatDrawerContainer,
-  MatDrawerContent,
-} from "@angular/material/sidenav";
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
 import { StoreService } from "src/app/services/store.service";
@@ -30,43 +24,42 @@ const ROWS_HEIGHT: { [id: number]: number } = {
 
 @Component({
   selector: "app-home",
-  imports: [
-    MatDrawerContainer,
-    MatDrawer,
-    MatDrawerContent,
-    MatGridList,
-    MatGridTile,
-    FiltersComponent,
-    ProductsHeaderComponent,
-    ProductBoxComponent,
-  ],
-  template: `<mat-drawer-container
-    [autosize]="true"
-    class="min-h-full max-w-7xl mx-auto border-x"
-  >
-    <mat-drawer mode="side" opened class="p-6">
-      <app-filters (showCategory)="onShowCategory($event)"></app-filters>
-    </mat-drawer>
-    <mat-drawer-content class="p-6">
-      <app-products-header
-        (columnsCountChange)="onColumnsCountChange($event)"
-        (sortValueChange)="onSortValueChange($event)"
-        (itemsShowCountChange)="onItemsShowCountChange($event)"
-      ></app-products-header>
-      <mat-grid-list gutterSize="16" [cols]="cols()" [rowHeight]="rowHeight()">
-        @for (product of products(); track product.id) {
-          <mat-grid-tile>
-            <app-product-box
-              [product]="product"
-              class="w-full"
-              [fullWidthMode]="cols() === 1"
-              (addToCart)="onAddToCart($event)"
-            ></app-product-box>
-          </mat-grid-tile>
-        }
-      </mat-grid-list>
-    </mat-drawer-content>
-  </mat-drawer-container> `,
+  imports: [FiltersComponent, ProductsHeaderComponent, ProductBoxComponent],
+  template: `
+    <div class="min-h-screen bg-gray-100">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div class="flex flex-col lg:flex-row gap-6 py-6">
+          <aside class="lg:w-80 w-full">
+            <div class="sticky top-6">
+              <app-filters
+                (showCategory)="onShowCategory($event)"
+              ></app-filters>
+            </div>
+          </aside>
+
+          <main class="flex-1">
+            <app-products-header
+              (columnsCountChange)="onColumnsCountChange($event)"
+              (sortValueChange)="onSortValueChange($event)"
+              (itemsShowCountChange)="onItemsShowCountChange($event)"
+            ></app-products-header>
+
+            <div [class]="getGridClass()" class="gap-4">
+              @for (product of products(); track product.id) {
+                <div>
+                  <app-product-box
+                    [product]="product"
+                    [fullWidthMode]="cols() === 1"
+                    (addToCart)="onAddToCart($event)"
+                  ></app-product-box>
+                </div>
+              }
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  `,
   providers: [StoreService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -94,6 +87,15 @@ export class HomeComponent {
         takeUntilDestroyed(this.destroyRef),
       ),
   );
+
+  getGridClass(): string {
+    const cols = this.cols();
+    if (cols === 1) return "grid grid-cols-1";
+    if (cols === 3) return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+    if (cols === 4)
+      return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+    return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+  }
 
   onSortValueChange(newSort: string): void {
     this.sortSignal.set(newSort);

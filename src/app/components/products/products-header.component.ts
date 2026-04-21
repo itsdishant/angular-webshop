@@ -4,48 +4,72 @@ import {
   EventEmitter,
   Output,
 } from "@angular/core";
-import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 
 @Component({
   selector: "app-products-header",
-  imports: [MatCard, MatIcon, MatMenuModule],
-  template: `<mat-card class="mb-4 px-4">
-    <div class="flex justify-between">
-      <div class="my-5 mx-3">
-        <button mat-button [matMenuTriggerFor]="sortByMenu">
-          Sort by {{ sort }}
-        </button>
-        <mat-menu #sortByMenu="matMenu">
-          <button mat-menu-item (click)="onSortUpdated('desc')">desc</button>
-          <button mat-menu-item (click)="onSortUpdated('asc')">asc</button>
-        </mat-menu>
-      </div>
-      <div class="flex items-center">
+  imports: [MatIcon, MatMenuModule],
+  template: `
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div class="flex flex-wrap justify-between items-center gap-4 p-4">
         <div>
-          <button mat-button [matMenuTriggerFor]="menu">
-            Show {{ itemsShowCount }}
-            <mat-icon iconPositionEnd>expand_more</mat-icon>
+          <button
+            [matMenuTriggerFor]="sortByMenu"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors duration-200 border border-gray-200 text-sm"
+          >
+            Sort by {{ sort }}
+            <mat-icon class="text-sm">expand_more</mat-icon>
           </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onItemsUpdated(12)">12</button>
-            <button mat-menu-item (click)="onItemsUpdated(24)">24</button>
-            <button mat-menu-item (click)="onItemsUpdated(36)">36</button>
+          <mat-menu #sortByMenu="matMenu">
+            <button mat-menu-item (click)="onSortUpdated('desc')">desc</button>
+            <button mat-menu-item (click)="onSortUpdated('asc')">asc</button>
           </mat-menu>
         </div>
-        <button (click)="onColumnsUpdated(1)">
-          <mat-icon>view_list</mat-icon>
-        </button>
-        <button (click)="onColumnsUpdated(3)">
-          <mat-icon>view_module</mat-icon>
-        </button>
-        <button (click)="onColumnsUpdated(4)">
-          <mat-icon>view_comfy</mat-icon>
-        </button>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div>
+            <button
+              [matMenuTriggerFor]="menu"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-blue-150 text-gray-700 rounded-lg transition-colors duration-200 border border-gray-200 text-sm"
+            >
+              Show {{ itemsShowCount }}
+              <mat-icon class="text-sm">expand_more</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onItemsUpdated(12)">12</button>
+              <button mat-menu-item (click)="onItemsUpdated(24)">24</button>
+              <button mat-menu-item (click)="onItemsUpdated(36)">36</button>
+            </mat-menu>
+          </div>
+
+          <div class="flex gap-1">
+            <button
+              (click)="onColumnsUpdated(1)"
+              class="p-2 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+              mat-icon-button
+            >
+              <mat-icon>view_list</mat-icon>
+            </button>
+            <button
+              (click)="onColumnsUpdated(3)"
+              class="p-2 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+              mat-icon-button
+            >
+              <mat-icon>view_module</mat-icon>
+            </button>
+            <button
+              (click)="onColumnsUpdated(4)"
+              class="p-2 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+              mat-icon-button
+            >
+              <mat-icon>view_comfy</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </mat-card> `,
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsHeaderComponent {

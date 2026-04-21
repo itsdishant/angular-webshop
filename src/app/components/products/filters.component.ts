@@ -5,41 +5,35 @@ import {
   inject,
   output,
 } from "@angular/core";
-import {
-  MatExpansionPanel,
-  MatExpansionPanelHeader,
-  MatExpansionPanelTitle,
-} from "@angular/material/expansion";
-import { MatListItem, MatSelectionList } from "@angular/material/list";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { StoreService } from "src/app/services/store.service";
 
 @Component({
   selector: "app-filters",
-  imports: [
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatExpansionPanelTitle,
-    MatSelectionList,
-    MatListItem,
-  ],
+  imports: [],
   template: `
     @if (categories()) {
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>  
-          <mat-panel-title> CATEGORIES </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-selection-list [multiple]="false">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+      >
+        <div class="border-b border-gray-200 bg-gray-50 px-4 py-3">
+          <h3
+            class="font-semibold text-gray-900 text-sm uppercase tracking-wide"
+          >
+            CATEGORIES
+          </h3>
+        </div>
+        <div class="divide-y divide-gray-100">
           @for (category of categories(); track category) {
-            <mat-list-item
-              class="text-center"
+            <button
               (click)="onShowCategory(category)"
+              class="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors duration-150 text-sm text-gray-700 hover:text-gray-900"
             >
               {{ category }}
-            </mat-list-item>
+            </button>
           }
-        </mat-selection-list>
-      </mat-expansion-panel>
+        </div>
+      </div>
     }
   `,
   providers: [StoreService],

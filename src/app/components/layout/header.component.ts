@@ -11,7 +11,7 @@ import { CartService } from "src/app/services/cart.service";
   imports: [MatIcon, CurrencyPipe, RouterLink, MatMenuTrigger, MatMenu],
   template: `
     <header
-      class="bg-gradient-to-tr from-green-50 to-teal-100 shadow-sm border-b border-gray-200 sticky top-0 z-50"
+      class="bg-gradient-to-tr from-blue-100 to-teal-100 shadow-sm border-b border-gray-200 sticky top-0 z-50"
     >
       <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div class="flex justify-between items-center py-3 sm:py-4">
