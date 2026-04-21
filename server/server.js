@@ -11,7 +11,7 @@ app.use(cors({ origin: true, credentials: true }));
 const SERVER_DOMAIN = "http://localhost:4242";
 
 const stripe = require("stripe")(
-  "sk_test_51L3e7nSHAdMfPiwlMpsxYSJI6jXmTfTkhDDQ4mlZlCdwMTbB3GZb86sAPWDzXE46K4n94FtGbnqwhdsWfsarI11z00XbevbOUq"
+  "sk_test_51TOa2rEWvxcI2QmbHQbOGasrwjGiY7rIMFIcvYMwp0W4fLcbQd90vRUffRRxcrxOPBBGqdSbZYcRPVo1xwvGHwgC00UgbPaN4k"
 );
 
 app.post("/checkout", async (req, resp, next) => {

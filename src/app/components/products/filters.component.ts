@@ -26,7 +26,7 @@ import { StoreService } from "src/app/services/store.service";
   template: `
     @if (categories()) {
       <mat-expansion-panel>
-        <mat-expansion-panel-header>
+        <mat-expansion-panel-header>  
           <mat-panel-title> CATEGORIES </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-selection-list [multiple]="false">

@@ -15,9 +15,9 @@ import {
 import { Product } from "src/app/models/product.model";
 import { CartService } from "src/app/services/cart.service";
 import { StoreService } from "src/app/services/store.service";
-import { FiltersComponent } from "../filters.component";
-import { ProductsHeaderComponent } from "../products-header.component";
-import { ProductBoxComponent } from "../product-box.component";
+import { FiltersComponent } from "../products/filters.component";
+import { ProductsHeaderComponent } from "../products/products-header.component";
+import { ProductBoxComponent } from "../products/product-box.component";
 import { derivedAsync } from "ngxtension/derived-async";
 import { filter } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -67,19 +67,19 @@ const ROWS_HEIGHT: { [id: number]: number } = {
       </mat-grid-list>
     </mat-drawer-content>
   </mat-drawer-container> `,
-  providers: [CartService, StoreService],
+  providers: [StoreService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
   private readonly cartService = inject(CartService);
   private readonly storeService = inject(StoreService);
-  private destroyRef = inject(DestroyRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly sortSignal = signal<string>("desc");
   private readonly limitSignal = signal<number>(12);
   private readonly categorySignal = signal<string>("all");
   readonly cols = signal<number>(3);
-  
+
   readonly rowHeight = computed(() => ROWS_HEIGHT[this.cols()]);
 
   readonly products = derivedAsync(() =>

@@ -9,36 +9,37 @@ import { Cart, CartItem } from "../models/cart.model";
 })
 export class CartService {
   private readonly snackBar = inject(MatSnackBar);
-  
+
   private readonly cartSubject = new BehaviorSubject<Cart>({ items: [] });
-  
+
   readonly cart$ = this.cartSubject.asObservable();
-  
+
   readonly cartItems$ = this.cart$.pipe(
-    map(cart => cart.items),
+    map((cart) => cart.items),
     distinctUntilChanged(),
-    shareReplay({ bufferSize: 1, refCount: false })
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
-  
+
   readonly cartTotal$ = this.cartItems$.pipe(
-    map(items => this.calculateTotal(items)),
+    map((items) => this.calculateTotal(items)),
     distinctUntilChanged(),
-    shareReplay({ bufferSize: 1, refCount: false })
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
-  
+
   readonly cartItemCount$ = this.cartItems$.pipe(
-    map(items => items.reduce((count, item) => count + item.quantity, 0)),
+    map((items) => items.reduce((count, item) => count + item.quantity, 0)),
     distinctUntilChanged(),
-    shareReplay({ bufferSize: 1, refCount: false })
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
-  
+
   readonly isEmpty$ = this.cartItems$.pipe(
-    map(items => items.length === 0),
-    distinctUntilChanged()
+    map((items) => items.length === 0),
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   private calculateTotal(items: CartItem[]): number {
-    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
   private showSnackbar(message: string): void {
@@ -54,23 +55,28 @@ export class CartService {
 
   addToCart(item: CartItem): void {
     const currentItems = this.cartSubject.value.items;
-    const existingItemIndex = currentItems.findIndex(cartItem => cartItem.id === item.id);
-    
+    const existingItemIndex = currentItems.findIndex(
+      (cartItem) => cartItem.id === item.id,
+    );
+
     if (existingItemIndex !== -1) {
       const updatedItems = [...currentItems];
       updatedItems[existingItemIndex] = {
         ...updatedItems[existingItemIndex],
-        quantity: updatedItems[existingItemIndex].quantity + 1
+        quantity: updatedItems[existingItemIndex].quantity + 1,
       };
       this.updateCart(updatedItems, "1 item added to cart.");
     } else {
-      this.updateCart([...currentItems, { ...item, quantity: 1 }], "1 item added to cart.");
+      this.updateCart(
+        [...currentItems, { ...item, quantity: 1 }],
+        "1 item added to cart.",
+      );
     }
   }
 
   removeFromCart(item: CartItem, shouldShowSnackbar = true): CartItem[] {
     const filteredItems = this.cartSubject.value.items.filter(
-      cartItem => cartItem.id !== item.id
+      (cartItem) => cartItem.id !== item.id,
     );
 
     if (shouldShowSnackbar) {
@@ -84,19 +90,21 @@ export class CartService {
 
   removeQuantity(item: CartItem): void {
     const currentItems = this.cartSubject.value.items;
-    const existingItemIndex = currentItems.findIndex(cartItem => cartItem.id === item.id);
+    const existingItemIndex = currentItems.findIndex(
+      (cartItem) => cartItem.id === item.id,
+    );
 
     if (existingItemIndex === -1) {
       return;
     }
 
     const existingItem = currentItems[existingItemIndex];
-    
+
     if (existingItem.quantity > 1) {
       const updatedItems = [...currentItems];
       updatedItems[existingItemIndex] = {
         ...existingItem,
-        quantity: existingItem.quantity - 1
+        quantity: existingItem.quantity - 1,
       };
       this.updateCart(updatedItems, "1 quantity reduced from product.");
     } else {
