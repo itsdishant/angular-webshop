@@ -1,4 +1,4 @@
-import { CurrencyPipe, NgClass } from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -90,7 +90,7 @@ import { Product } from "src/app/models/product.model";
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-      .hover\:line-clamp-none:hover {
+      .hover:line-clamp-none:hover {
         -webkit-line-clamp: unset;
       }
     `,

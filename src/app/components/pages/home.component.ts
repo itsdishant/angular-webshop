@@ -16,7 +16,7 @@ import { derivedAsync } from "ngxtension/derived-async";
 import { filter } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
-const ROWS_HEIGHT: { [id: number]: number } = {
+const ROWS_HEIGHT: Record<number, number> = {
   1: 400,
   3: 335,
   4: 350,

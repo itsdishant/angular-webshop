@@ -1,5 +1,4 @@
 import { CurrencyPipe } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,13 +7,9 @@ import {
   signal,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { loadStripe } from "@stripe/stripe-js";
 import { CartItem } from "src/app/models/cart.model";
 import { CartService } from "src/app/services/cart.service";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { filter, switchMap } from "rxjs";
-import { derivedAsync } from "ngxtension/derived-async";
-import { Subject } from "rxjs";
 import { RouterLink } from "@angular/router";
 
 @Component({

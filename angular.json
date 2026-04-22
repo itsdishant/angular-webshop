@@ -112,6 +112,15 @@
               "devServerTarget": "ang-store:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
@@ -119,6 +128,7 @@
   "cli": {
     "analytics": "8ce73bd8-1f59-4dec-9cd9-f275a2be4c0f",
     "schematicCollections": [
+      "angular-eslint",
       "@schematics/angular",
       "playwright-ng-schematics"
     ]
