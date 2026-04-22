@@ -12,21 +12,16 @@ import {
 } from "@angular/common/http";
 import { HomeComponent } from "./app/components/pages/home.component";
 import { CartComponent } from "./app/components/pages/cart.component";
+import { PaymentCancelComponent } from "./app/components/pages/payment-cancel.component";
+import { PaymentSuccessComponent } from "./app/components/pages/payment-success.component";
 
-const routes: Routes = [
-  {
-    path: "home",
-    component: HomeComponent,
-  },
-  {
-    path: "cart",
-    component: CartComponent,
-  },
-  {
-    path: "",
-    redirectTo: "home",
-    pathMatch: "full",
-  },
+export const routes: Routes = [
+  { path: "home", component: HomeComponent },
+  { path: "cart", component: CartComponent },
+  { path: "payment-success", component: PaymentSuccessComponent },
+  { path: "payment-cancel", component: PaymentCancelComponent },
+  { path: "", redirectTo: "/home", pathMatch: "full" },
+  { path: "**", redirectTo: "/home" },
 ];
 
 export const appConfig: ApplicationConfig = {

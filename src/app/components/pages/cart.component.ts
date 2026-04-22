@@ -311,9 +311,6 @@ import { RouterLink } from "@angular/router";
 })
 export class CartComponent {
   private readonly cartService = inject(CartService);
-  private readonly http = inject(HttpClient);
-
-  private readonly checkoutTrigger$ = new Subject<void>();
 
   readonly cartItems = toSignal(this.cartService.cartItems$, {
     initialValue: [],
@@ -325,20 +322,73 @@ export class CartComponent {
     this.cartItems().reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
-  private readonly stripePromise = loadStripe(
-    "pk_test_51TOa2rEWvxcI2QmbX5u0puMqasGtbleqNlCWdcHQu7M3DmNetEmaMwz5usiRE9nri2eIQDM3XIg4LOAq5ORJ04AM0012Hrpj9g",
-  );
+  private readonly stripeSecretKey =
+    "sk_test_51TOvPrIPz5nIzXXmDKeWytnwh4LBZKW6LLz1NcZIakwuvaylUu0fyHF9wRJd8FfQXiuJOa3jiP9kFAHThXJb1Ipx00sAbnHUN0";
 
-  private readonly checkoutResponse = derivedAsync(() =>
-    this.checkoutTrigger$.pipe(
-      filter(() => this.cartItems().length > 0),
-      switchMap(() =>
-        this.http.post("http://localhost:4242/checkout", {
-          items: this.cartItems(),
-        }),
-      ),
-    ),
-  );
+  async onCheckout(): Promise<void> {
+    if (this.isProcessingPayment() || this.cartItems().length === 0) {
+      return;
+    }
+
+    this.isProcessingPayment.set(true);
+
+    try {
+      const response = await fetch(
+        "https://api.stripe.com/v1/checkout/sessions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${this.stripeSecretKey}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: this.buildCheckoutSessionBody(),
+        },
+      );
+
+      const session = await response.json();
+
+      if (session.id && session.url) {
+        window.location.href = session.url;
+      } else {
+        throw new Error(
+          session.error?.message || "Failed to create checkout session",
+        );
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert(
+        `Payment initialization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      this.isProcessingPayment.set(false);
+    }
+  }
+
+  private buildCheckoutSessionBody(): string {
+    const params = new URLSearchParams();
+    params.append("mode", "payment");
+    params.append("success_url", `${window.location.origin}/payment-success`);
+    params.append("cancel_url", `${window.location.origin}/payment-cancel`);
+
+    this.cartItems().forEach((item, index) => {
+      params.append(`line_items[${index}][price_data][currency]`, "usd");
+      params.append(
+        `line_items[${index}][price_data][product_data][name]`,
+        item.name,
+      );
+      params.append(
+        `line_items[${index}][price_data][product_data][images][0]`,
+        item.product,
+      );
+      params.append(
+        `line_items[${index}][price_data][unit_amount]`,
+        (item.price * 10 * 100).toString(),
+      );
+      params.append(`line_items[${index}][quantity]`, item.quantity.toString());
+    });
+
+    return params.toString();
+  }
 
   addQuantity(item: CartItem): void {
     this.cartService.addToCart(item);
@@ -354,46 +404,5 @@ export class CartComponent {
 
   clearAllCartItems(): void {
     this.cartService.clearCart();
-  }
-
-  async onCheckout(): Promise<void> {
-    if (this.isProcessingPayment() || this.cartItems().length === 0) {
-      return;
-    }
-
-    this.isProcessingPayment.set(true);
-
-    try {
-      this.checkoutTrigger$.next();
-
-      const response = await this.checkoutResponse();
-
-      if (response && (response as any).id) {
-        const stripe = await this.stripePromise;
-
-        if (stripe) {
-          const { error } = await stripe.confirmPayment({
-            elements: stripe.elements(),
-            clientSecret: (response as any).clientSecret,
-            confirmParams: {
-              return_url: `${window.location.origin}/payment-success`,
-            },
-            redirect: "if_required",
-          });
-
-          if (error) {
-            console.error("Payment error:", error);
-            alert(`Payment failed: ${error.message}`);
-          } else {
-            this.cartService.clearCart();
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("An error occurred during checkout. Please try again.");
-    } finally {
-      this.isProcessingPayment.set(false);
-    }
   }
 }

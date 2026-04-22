@@ -1,6 +1,6 @@
 import { Injectable, inject } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { map, distinctUntilChanged, shareReplay } from "rxjs/operators";
 import { Cart, CartItem } from "../models/cart.model";
 
