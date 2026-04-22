@@ -4,7 +4,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenu, MatMenuTrigger } from "@angular/material/menu";
 import { RouterLink } from "@angular/router";
-import { CartService } from "src/app/services/cart.service";
+import { CartService } from "@app/services/cart.service";
 
 @Component({
   selector: "app-header",

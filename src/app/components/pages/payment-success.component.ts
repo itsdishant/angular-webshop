@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { MatIcon } from "@angular/material/icon";
-import { CartService } from "src/app/services/cart.service";
+import { CartService } from "@app/services/cart.service";
 
 @Component({
   selector: "app-payment-success",

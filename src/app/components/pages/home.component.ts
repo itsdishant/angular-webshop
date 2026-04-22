@@ -6,15 +6,15 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import { Product } from "src/app/models/product.model";
-import { CartService } from "src/app/services/cart.service";
-import { StoreService } from "src/app/services/store.service";
 import { FiltersComponent } from "../products/filters.component";
 import { ProductsHeaderComponent } from "../products/products-header.component";
 import { ProductBoxComponent } from "../products/product-box.component";
 import { derivedAsync } from "ngxtension/derived-async";
 import { filter } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { StoreService } from "@app/services/store.service";
+import { CartService } from "@app/services/cart.service";
+import { Product } from "@app/models/product.model";
 
 const ROWS_HEIGHT: Record<number, number> = {
   1: 400,

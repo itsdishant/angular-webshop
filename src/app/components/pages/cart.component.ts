@@ -7,8 +7,8 @@ import {
   signal,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { CartItem } from "src/app/models/cart.model";
-import { CartService } from "src/app/services/cart.service";
+import { CartItem } from "@app/models/cart.model";
+import { CartService } from "@app/services/cart.service";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { RouterLink } from "@angular/router";
 

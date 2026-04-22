@@ -7,7 +7,7 @@ import {
   Output,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { Product } from "src/app/models/product.model";
+import { Product } from "@app/models/product.model";
 
 @Component({
   selector: "app-product-box",
