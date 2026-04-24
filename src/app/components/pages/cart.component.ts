@@ -377,7 +377,7 @@ export class CartComponent {
       );
       params.append(
         `line_items[${index}][price_data][unit_amount]`,
-        (item.price * 10 * 100).toString(),
+        (item.price * 1 * 100).toString(),
       );
       params.append(`line_items[${index}][quantity]`, item.quantity.toString());
     });
