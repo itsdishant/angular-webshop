@@ -3,6 +3,7 @@ const eslint = require("@eslint/js");
 const { defineConfig } = require("eslint/config");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
+const unusedImports = require("eslint-plugin-unused-imports");
 
 module.exports = defineConfig([
   {
@@ -42,7 +43,9 @@ module.exports = defineConfig([
     rules: {},
   },
   {
-    plugins: ["unused-imports"],
+    plugins: {
+      "unused-imports": unusedImports,
+    },
     rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
