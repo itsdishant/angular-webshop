@@ -68,7 +68,7 @@ export class HomeComponent {
   private readonly storeService = inject(StoreService);
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly sortSignal = signal<string>("desc");
+  private readonly sortSignal = signal<string>("asc");
   private readonly limitSignal = signal<number>(12);
   private readonly categorySignal = signal<string>("all");
   readonly cols = signal<number>(3);
@@ -76,16 +76,10 @@ export class HomeComponent {
   readonly rowHeight = computed(() => ROWS_HEIGHT[this.cols()]);
 
   readonly products = derivedAsync(() =>
-    this.storeService
-      .getAllProducts(
-        this.limitSignal(),
-        this.sortSignal(),
-        this.categorySignal(),
-      )
-      .pipe(
-        filter((products) => !!products),
-        takeUntilDestroyed(this.destroyRef),
-      ),
+    this.storeService.getAllProducts().pipe(
+      filter((products) => !!products),
+      takeUntilDestroyed(this.destroyRef),
+    ),
   );
 
   getGridClass(): string {

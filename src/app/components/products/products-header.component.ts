@@ -77,7 +77,7 @@ export class ProductsHeaderComponent {
   @Output() sortValueChange = new EventEmitter<string>();
   @Output() itemsShowCountChange = new EventEmitter<number>();
 
-  sort = "desc";
+  sort = "asc";
   itemsShowCount = 12;
 
   onSortUpdated(newSort: string): void {

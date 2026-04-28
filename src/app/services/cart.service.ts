@@ -65,7 +65,7 @@ export class CartService {
         ...updatedItems[existingItemIndex],
         quantity: updatedItems[existingItemIndex].quantity + 1,
       };
-      this.updateCart(updatedItems, "1 item added to cart.");
+      this.updateCart(updatedItems, "1 quantity added to product.");
     } else {
       this.updateCart(
         [...currentItems, { ...item, quantity: 1 }],

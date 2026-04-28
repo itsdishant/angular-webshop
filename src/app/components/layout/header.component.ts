@@ -19,7 +19,7 @@ import { CartService } from "@app/services/cart.service";
             routerLink="home"
             class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300"
           >
-            {{ "Lifestyle Stores" }}
+            {{ "LifeStyle Stores" }}
           </a>
 
           <button

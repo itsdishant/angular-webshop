@@ -13,7 +13,7 @@ export class StoreService {
 
   getAllProducts(
     limit = 12,
-    sort = "desc",
+    sort = "asc",
     category = "all",
   ): Observable<Product[]> {
     return this.httpClient.get<Product[]>(
