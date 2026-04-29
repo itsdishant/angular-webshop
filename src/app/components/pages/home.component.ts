@@ -2,16 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  DestroyRef,
   inject,
   signal,
 } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { FiltersComponent } from "../products/filters.component";
 import { ProductsHeaderComponent } from "../products/products-header.component";
 import { ProductBoxComponent } from "../products/product-box.component";
-import { derivedAsync } from "ngxtension/derived-async";
-import { filter } from "rxjs";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { StoreService } from "@app/services/store.service";
 import { CartService } from "@app/services/cart.service";
 import { Product } from "@app/models/product.model";
@@ -24,7 +22,12 @@ const ROWS_HEIGHT: Record<number, number> = {
 
 @Component({
   selector: "app-home",
-  imports: [FiltersComponent, ProductsHeaderComponent, ProductBoxComponent],
+  imports: [
+    CommonModule,
+    FiltersComponent,
+    ProductsHeaderComponent,
+    ProductBoxComponent,
+  ],
   template: `
     <div class="min-h-screen bg-gray-100">
       <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
@@ -66,21 +69,13 @@ const ROWS_HEIGHT: Record<number, number> = {
 export class HomeComponent {
   private readonly cartService = inject(CartService);
   private readonly storeService = inject(StoreService);
-  private readonly destroyRef = inject(DestroyRef);
 
-  private readonly sortSignal = signal<string>("asc");
-  private readonly limitSignal = signal<number>(12);
-  private readonly categorySignal = signal<string>("all");
   readonly cols = signal<number>(3);
-
   readonly rowHeight = computed(() => ROWS_HEIGHT[this.cols()]);
 
-  readonly products = derivedAsync(() =>
-    this.storeService.getAllProducts().pipe(
-      filter((products) => !!products),
-      takeUntilDestroyed(this.destroyRef),
-    ),
-  );
+  readonly products = toSignal(this.storeService.products$, {
+    initialValue: [],
+  });
 
   getGridClass(): string {
     const cols = this.cols();
@@ -92,15 +87,15 @@ export class HomeComponent {
   }
 
   onSortValueChange(newSort: string): void {
-    this.sortSignal.set(newSort);
+    this.storeService.setSort(newSort);
   }
 
   onItemsShowCountChange(newLimit: number): void {
-    this.limitSignal.set(newLimit);
+    this.storeService.setLimit(newLimit);
   }
 
   onShowCategory(newCategory: string): void {
-    this.categorySignal.set(newCategory);
+    this.storeService.setCategory(newCategory);
   }
 
   onColumnsCountChange(colsNum: number): void {

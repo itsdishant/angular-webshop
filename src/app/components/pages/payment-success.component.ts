@@ -35,6 +35,7 @@ import { CartService } from "@app/services/cart.service";
 })
 export class PaymentSuccessComponent {
   private cartService = inject(CartService);
+  
   constructor() {
     this.cartService.clearCart();
   }

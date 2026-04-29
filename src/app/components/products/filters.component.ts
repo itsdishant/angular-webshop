@@ -44,10 +44,9 @@ export class FiltersComponent {
 
   readonly showCategory = output<string>();
 
-  private readonly categoriesFromApi = toSignal(
-    this.storeService.getAllCategories(),
-    { initialValue: [] },
-  );
+  private readonly categoriesFromApi = toSignal(this.storeService.categories$, {
+    initialValue: [],
+  });
 
   readonly categories = computed(() => {
     const categories = this.categoriesFromApi();

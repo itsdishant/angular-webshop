@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  output,
   Output,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
@@ -73,9 +74,9 @@ import { MatMenuModule } from "@angular/material/menu";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsHeaderComponent {
-  @Output() columnsCountChange = new EventEmitter<number>();
-  @Output() sortValueChange = new EventEmitter<string>();
-  @Output() itemsShowCountChange = new EventEmitter<number>();
+  itemsShowCountChange = output<number>();
+  columnsCountChange = output<number>();
+  sortValueChange = output<string>();
 
   sort = "asc";
   itemsShowCount = 12;

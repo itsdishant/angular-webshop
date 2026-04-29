@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { switchMap, shareReplay } from "rxjs/operators";
 import { Product } from "../models/product.model";
 
 const STORE_BASE_URL = "https://fakestoreapi.com";
@@ -11,21 +12,38 @@ const STORE_BASE_URL = "https://fakestoreapi.com";
 export class StoreService {
   private httpClient = inject(HttpClient);
 
-  getAllProducts(
-    limit = 12,
-    sort = "asc",
-    category = "all",
-  ): Observable<Product[]> {
-    return this.httpClient.get<Product[]>(
-      category === "all"
-        ? `${STORE_BASE_URL}/products?sort=${sort}&limit=${limit}`
-        : `${STORE_BASE_URL}/products/category/${category}?sort=${sort}&limit=${limit}`,
-    );
+  private readonly limit$ = new BehaviorSubject<number>(12);
+  private readonly sort$ = new BehaviorSubject<string>("asc");
+  private readonly category$ = new BehaviorSubject<string>("all");
+
+  readonly products$ = combineLatest([
+    this.limit$,
+    this.sort$,
+    this.category$,
+  ]).pipe(
+    switchMap(([limit, sort, category]) =>
+      this.httpClient.get<Product[]>(
+        category === "all"
+          ? `${STORE_BASE_URL}/products?sort=${sort}&limit=${limit}`
+          : `${STORE_BASE_URL}/products/category/${category}?sort=${sort}&limit=${limit}`,
+      ),
+    ),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  readonly categories$ = this.httpClient
+    .get<string[]>(`${STORE_BASE_URL}/products/categories`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  setLimit(limit: number): void {
+    this.limit$.next(limit);
   }
 
-  getAllCategories(): Observable<string[]> {
-    return this.httpClient.get<string[]>(
-      `${STORE_BASE_URL}/products/categories`,
-    );
+  setSort(sort: string): void {
+    this.sort$.next(sort);
+  }
+
+  setCategory(category: string): void {
+    this.category$.next(category);
   }
 }

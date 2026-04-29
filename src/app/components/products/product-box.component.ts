@@ -3,7 +3,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  input,
   Input,
+  output,
   Output,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
@@ -13,17 +15,18 @@ import { Product } from "@app/models/product.model";
   selector: "app-product-box",
   imports: [CurrencyPipe, MatIcon],
   template: `
+    @let product = this.product();
     @if (product) {
       <div
         class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col"
       >
-        <div [class]="fullWidthMode ? 'flex flex-col sm:flex-row' : ''">
+        <div [class]="fullWidthMode() ? 'flex flex-col sm:flex-row' : ''">
           <div
-            [class]="fullWidthMode ? 'sm:w-48 md:w-64 flex-shrink-0' : 'p-4'"
+            [class]="fullWidthMode() ? 'sm:w-48 md:w-64 flex-shrink-0' : 'p-4'"
           >
             <img
               [class]="
-                fullWidthMode
+                fullWidthMode()
                   ? 'w-full h-48 sm:h-full object-contain'
                   : 'w-full h-48 object-contain mb-2'
               "
@@ -34,7 +37,7 @@ import { Product } from "@app/models/product.model";
 
           <div
             [class]="
-              fullWidthMode
+              fullWidthMode()
                 ? 'flex-1 p-4 sm:p-6 flex flex-col justify-between'
                 : 'p-4'
             "
@@ -50,7 +53,7 @@ import { Product } from "@app/models/product.model";
                 {{ product.title }}
               </p>
 
-              @if (fullWidthMode) {
+              @if (fullWidthMode()) {
                 <p class="text-sm text-gray-600 line-clamp-3 mb-3">
                   {{ product.description }}
                 </p>
@@ -98,11 +101,11 @@ import { Product } from "@app/models/product.model";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductBoxComponent {
-  @Input() fullWidthMode = false;
-  @Input() product: Product | undefined;
-  @Output() addToCart = new EventEmitter();
+  fullWidthMode = input<boolean>(false);
+  product = input<Product | undefined>();
+  addToCart = output<Product>();
 
   onAddToCart(): void {
-    this.addToCart.emit(this.product);
+    this.addToCart.emit(this.product()!);
   }
 }
