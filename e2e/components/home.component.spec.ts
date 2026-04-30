@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../coverage";
 import { mockStoreApi } from "./helpers/store-api";
 
 test.describe("HomeComponent", () => {

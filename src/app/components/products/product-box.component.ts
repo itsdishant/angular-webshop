@@ -2,11 +2,8 @@ import { CurrencyPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
   input,
-  Input,
   output,
-  Output,
 } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Product } from "@app/models/product.model";

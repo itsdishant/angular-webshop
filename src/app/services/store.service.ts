@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { BehaviorSubject, combineLatest } from "rxjs";
 import { switchMap, shareReplay } from "rxjs/operators";
 import { Product } from "../models/product.model";
 
