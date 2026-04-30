@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ang-store": {
+    "lifestyle-stores": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -41,7 +41,7 @@
           "builder": "@angular/build:application",
           "options": {
             "outputPath": {
-              "base": "dist/ang-store"
+              "base": "dist/lifestyle-stores"
             },
             "index": "src/index.html",
             "polyfills": [
@@ -88,10 +88,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ang-store:build:production"
+              "buildTarget": "lifestyle-stores:build:production"
             },
             "development": {
-              "buildTarget": "ang-store:build:development"
+              "buildTarget": "lifestyle-stores:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -99,17 +99,17 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "ang-store:build"
+            "buildTarget": "lifestyle-stores:build"
           }
         },
         "e2e": {
           "builder": "playwright-ng-schematics:playwright",
           "options": {
-            "devServerTarget": "ang-store:serve"
+            "devServerTarget": "lifestyle-stores:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ang-store:serve:production"
+              "devServerTarget": "lifestyle-stores:serve:production"
             }
           }
         },
