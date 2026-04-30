@@ -48,7 +48,7 @@ import { Product } from "@app/models/product.model";
               </h5>
 
               <p
-                class="text-sm font-medium text-gray-900 line-clamp-2 hover:line-clamp-none mb-2"
+                class="text-sm font-medium text-gray-900 line-clamp-2 hover:line-clamp-none mb-2 min-h-10"
               >
                 {{ product.title }}
               </p>
